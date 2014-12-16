@@ -44,10 +44,10 @@ sit-effects:
     amount: 1
     max-percent: 100
   itempickup:
-    enabled: false
+    enabled: true
 sit-restrictions:
   commands:
-    all: false
+    all: true
     list:
     - /examplecommand
 notify-player: true
