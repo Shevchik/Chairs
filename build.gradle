@@ -18,8 +18,6 @@ plugins {
 	id 'java'
 }
 
-apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
-
 tasks.withType(AbstractCompile) {
 	classpath += configurations.shadow
 }
