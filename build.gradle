@@ -1,0 +1,95 @@
+buildscript {
+	dependencies {
+		classpath 'org.jdom:jdom2:2.0.6'
+		classpath 'org.ow2.asm:asm:5.1'
+		classpath 'org.ow2.asm:asm-commons:5.1'
+		classpath 'commons-io:commons-io:2.5'
+		classpath 'org.apache.ant:ant:1.9.7'
+		classpath 'org.codehaus.plexus:plexus-utils:3.0.24'
+		classpath 'org.vafer:jdependency:1.1'
+		classpath files('gradle/plugins/shadowPlugin.jar')
+	}
+	repositories {
+		mavenCentral()
+	}
+}
+
+plugins {
+	id 'java'
+}
+
+apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+
+tasks.withType(AbstractCompile) {
+	classpath += configurations.shadow
+}
+
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+group 'chairs'
+version '4.2'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+import java.text.MessageFormat
+
+File dlDepsDir = new File('dllibs')
+dlDepsDir.mkdirs()
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src']
+		}
+		resources {
+			srcDirs = ['resources']
+		}
+	}
+	test {
+		java {
+			srcDirs = ['tests']
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+task copyFinalJarToTarget(type: Copy) {
+	// JitPack searches for the output jar at the standard Gradle output directory (jar.archivePath)
+	// By copying it from there to our target destination JitPack can archive it in a Maven repository
+	from jar.archivePath.getPath()
+	into 'target'
+
+	//remove version suffix
+	rename (jar.archiveName, jar.baseName + '.jar')
+}
+
+shadowJar {
+	doFirst {
+		new File(destinationDir, archiveName).delete()
+	}
+
+	from sourceSets.main.java.srcDirs
+	from 'LICENSE'
+
+	//remove the -all suffix
+	archiveName = jar.archiveName
+	minimizeJar = true
+
+	exclude 'META-INF/**'
+}
+
+compileJava.dependsOn(clean)
+compileJava.finalizedBy(test)
+jar.enabled = false
+jar.finalizedBy(shadowJar)
+shadowJar.finalizedBy(copyFinalJarToTarget)
