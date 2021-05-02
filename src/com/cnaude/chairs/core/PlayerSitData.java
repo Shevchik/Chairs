@@ -65,27 +65,13 @@ public class PlayerSitData {
 			player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getChairsConfig().msgSitEnter));
 		}
 		Entity chairentity = plugin.getSitUtils().spawnChairEntity(sitlocation);
-		SitData sitdata = new SitData(
-			chairentity, player.getLocation(), blocktooccupy,
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
-		);
+		SitData sitdata = new SitData(chairentity, player.getLocation(), blocktooccupy);
 		player.teleport(sitlocation);
 		chairentity.addPassenger(player);
 		sittingPlayers.put(player, sitdata);
 		occupiedBlocks.put(blocktooccupy, player);
 		sitdata.sitting = true;
 		return true;
-	}
-
-	public void resitPlayer(final Player player) {
-		SitData sitdata = sittingPlayers.get(player);
-		sitdata.sitting = false;
-		Entity oldentity = sitdata.entity;
-		Entity chairentity = plugin.getSitUtils().spawnChairEntity(oldentity.getLocation());
-		chairentity.addPassenger(player);
-		sitdata.entity = chairentity;
-		oldentity.remove();
-		sitdata.sitting = true;
 	}
 
 	public boolean unsitPlayer(Player player) {
@@ -108,7 +94,6 @@ public class PlayerSitData {
 		sitdata.entity.remove();
 		player.setSneaking(false);
 		occupiedBlocks.remove(sitdata.occupiedBlock);
-		Bukkit.getScheduler().cancelTask(sitdata.resitTaskId);
 		sittingPlayers.remove(player);
 		if (teleport) {
 			player.teleport(playerunsitevent.getTeleportLocation().clone());
@@ -123,16 +108,14 @@ public class PlayerSitData {
 
 		protected final Location teleportBackLocation;
 		protected final Block occupiedBlock;
-		protected final int resitTaskId;
 
 		protected boolean sitting;
 		protected Entity entity;
 
-		public SitData(Entity arrow, Location teleportLocation, Block block, int resitTaskId) {
+		public SitData(Entity arrow, Location teleportLocation, Block block) {
 			this.entity = arrow;
 			this.teleportBackLocation = teleportLocation;
 			this.occupiedBlock = block;
-			this.resitTaskId = resitTaskId;
 		}
 
 	}
