@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -65,10 +66,15 @@ public class PlayerSitData {
 			player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getChairsConfig().msgSitEnter));
 		}
 		Entity chairentity = plugin.getSitUtils().spawnChairEntity(sitlocation);
-		SitData sitdata = new SitData(
-			chairentity, player.getLocation(), blocktooccupy,
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
-		);
+		SitData sitdata;
+		if(chairentity.getType().equals(EntityType.ARMOR_STAND)){
+			sitdata= new SitData(chairentity, player.getLocation(), blocktooccupy);
+		}else{
+			sitdata= new SitData(
+					chairentity, player.getLocation(), blocktooccupy,
+					Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
+			);
+		}
 		player.teleport(sitlocation);
 		chairentity.addPassenger(player);
 		sittingPlayers.put(player, sitdata);
@@ -105,10 +111,12 @@ public class PlayerSitData {
 		}
 		sitdata.sitting = false;
 		player.leaveVehicle();
-		sitdata.entity.remove();
 		player.setSneaking(false);
 		occupiedBlocks.remove(sitdata.occupiedBlock);
-		Bukkit.getScheduler().cancelTask(sitdata.resitTaskId);
+		if(!sitdata.entity.getType().equals(EntityType.ARMOR_STAND)) {
+			Bukkit.getScheduler().cancelTask(sitdata.resitTaskId);
+		}
+		sitdata.entity.remove();
 		sittingPlayers.remove(player);
 		if (teleport) {
 			player.teleport(playerunsitevent.getTeleportLocation().clone());
@@ -123,7 +131,7 @@ public class PlayerSitData {
 
 		protected final Location teleportBackLocation;
 		protected final Block occupiedBlock;
-		protected final int resitTaskId;
+		protected int resitTaskId;
 
 		protected boolean sitting;
 		protected Entity entity;
@@ -133,6 +141,12 @@ public class PlayerSitData {
 			this.teleportBackLocation = teleportLocation;
 			this.occupiedBlock = block;
 			this.resitTaskId = resitTaskId;
+		}
+
+		public SitData(Entity arrow, Location teleportLocation, Block block) {
+			this.entity = arrow;
+			this.teleportBackLocation = teleportLocation;
+			this.occupiedBlock = block;
 		}
 
 	}
