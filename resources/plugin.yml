@@ -1,7 +1,7 @@
 name: Chairs
 main: com.cnaude.chairs.core.Chairs
 api-version: 1.14
-version: 7.0
+version: 7.1
 description: Let players sit on blocks.
 website: http://dev.bukkit.org/bukkit-plugins/chairsreloaded/
 authors: 
