@@ -53,6 +53,7 @@ public class ChairsConfig {
 	protected static final String sitRestricitonsCommandsSectionPath = "commands";
 	protected static final String sitRestrictionsCommandsBlockAllPath = "all";
 	protected static final String sitRestrictionsCommandsBlockListPath = "list";
+	protected static final String sitRestrictionsCommandsAllowListPath = "allowed";
 
 	protected static final String msgSectionPath = "messages";
 	protected static final String msgEnabledPath = "enabled";
@@ -86,6 +87,7 @@ public class ChairsConfig {
 
 	public boolean restrictionsDisableAllCommands = false;
 	public final Set<String> restrictionsDisabledCommands = new HashSet<>();
+	public final Set<String> restrictionsAllowedCommands = new HashSet<>();
 
 	public boolean msgEnabled = true;
 	public String msgSitEnter = "&7You are now sitting.";
@@ -155,6 +157,8 @@ public class ChairsConfig {
 					restrictionsDisableAllCommands = sitRestrictionsCommandsSection.getBoolean(sitRestrictionsCommandsBlockAllPath, restrictionsDisableAllCommands);
 					restrictionsDisabledCommands.clear();
 					restrictionsDisabledCommands.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsBlockListPath));
+					restrictionsAllowedCommands.clear();
+					restrictionsAllowedCommands.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsAllowListPath));
 				}
 			}
 
@@ -224,6 +228,7 @@ public class ChairsConfig {
 				{
 					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockAllPath, restrictionsDisableAllCommands);
 					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockListPath, new ArrayList<>(restrictionsDisabledCommands));
+					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsAllowListPath, new ArrayList<>(restrictionsAllowedCommands));
 				}
 			}
 

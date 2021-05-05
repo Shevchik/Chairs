@@ -27,6 +27,7 @@
 #   commands:
 #     all: If set to true, restricts using all commands while sitting
 #     list: List of commands which player can't use while sitting
+#     allow: List of allowed commands while sitting
 #
 # messages:
 #  enabled: true #enables user messages

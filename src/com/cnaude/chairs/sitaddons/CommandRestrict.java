@@ -28,20 +28,30 @@ public class CommandRestrict implements Listener {
 		Player player = event.getPlayer();
 		String playercommand = event.getMessage().toLowerCase();
 		if (plugin.getPlayerSitData().isSitting(player)) {
+			Boolean cancel = false;
 			if (config.restrictionsDisableAllCommands) {
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.msgSitCommandRestricted));
-				return;
+				cancel = true;
 			}
-			for (String disabledCommand : config.restrictionsDisabledCommands) {
+			else for (String disabledCommand : config.restrictionsDisabledCommands) {
 				if (disabledCommand.startsWith(playercommand)) {
 					String therest = playercommand.replace(disabledCommand, "");
 					if (therest.isEmpty() || therest.startsWith(" ")) {
-						event.setCancelled(true);
-						player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.msgSitCommandRestricted));
-						return;
+						cancel = true;
 					}
 				}
+			}
+			for (String allowedCommand : config.restrictionsAllowedCommands) {
+				if (playercommand.startsWith(allowedCommand)) {
+					String therest = playercommand.replace(allowedCommand, "");
+					if (therest.isEmpty() || therest.startsWith(" ")) {
+						cancel = false;
+					}
+				}
+			}
+			if (cancel) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.msgSitCommandRestricted));
+				return;
 			}
 		}
 	}
