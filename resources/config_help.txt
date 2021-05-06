@@ -13,6 +13,7 @@
 #     special-end: set any sub options to true to require special block (one of them) at the end of the stairs line (only works if max-width is enabled)
 #       sign: require sign
 #       corner-stairs: require corner stairs
+#     height: Set sitting height on stairs
 #   additional-blocks: Set additional blocks you want to be able to sit down on and sitting height.
 #     COBBLESTONE_SLAB: 0.7
 # sit-effects:
