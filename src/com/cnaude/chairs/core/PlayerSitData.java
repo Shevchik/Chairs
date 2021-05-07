@@ -65,10 +65,20 @@ public class PlayerSitData {
 			player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getChairsConfig().msgSitEnter));
 		}
 		Entity chairentity = plugin.getSitUtils().spawnChairEntity(sitlocation);
-		SitData sitdata = new SitData(
-			chairentity, player.getLocation(), blocktooccupy,
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
-		);
+		SitData sitdata = null;
+		switch (plugin.getChairsConfig().sitChairEntityType) {
+			case ARROW: {
+				sitdata = new SitData(
+					chairentity, player.getLocation(), blocktooccupy,
+					Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
+				);
+				break;
+			}
+			case ARMOR_STAND: {
+				sitdata = new SitData(chairentity, player.getLocation(), blocktooccupy, -1);
+				break;
+			}
+		}
 		player.teleport(sitlocation);
 		chairentity.addPassenger(player);
 		sittingPlayers.put(player, sitdata);
@@ -108,7 +118,9 @@ public class PlayerSitData {
 		sitdata.entity.remove();
 		player.setSneaking(false);
 		occupiedBlocks.remove(sitdata.occupiedBlock);
-		Bukkit.getScheduler().cancelTask(sitdata.resitTaskId);
+		if (sitdata.resitTaskId != -1) {
+			Bukkit.getScheduler().cancelTask(sitdata.resitTaskId);
+		}
 		sittingPlayers.remove(player);
 		if (teleport) {
 			player.teleport(playerunsitevent.getTeleportLocation().clone());
