@@ -69,12 +69,14 @@ public class PlayerSitData {
 		switch (plugin.getChairsConfig().sitChairEntityType) {
 			case ARROW: {
 				sitdata = new SitData(
-						chairentity, player.getLocation(), blocktooccupy,
-						Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
-					);
+					chairentity, player.getLocation(), blocktooccupy,
+					Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
+				);
+				break;
 			}
 			case ARMOR_STAND: {
 				sitdata = new SitData(chairentity, player.getLocation(), blocktooccupy, -1);
+				break;
 			}
 		}
 		player.teleport(sitlocation);
