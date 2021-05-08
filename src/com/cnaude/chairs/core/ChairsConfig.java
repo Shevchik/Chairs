@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -52,9 +53,9 @@ public class ChairsConfig {
 
 	protected static final String sitRestrictionsSectionPath = "sit-restrictions";
 	protected static final String sitRestricitonsCommandsSectionPath = "commands";
-	protected static final String sitRestrictionsCommandsBlockAllPath = "all";
-	protected static final String sitRestrictionsCommandsBlockListPath = "list";
-	protected static final String sitRestrictionsCommandsAllowListPath = "allowed";
+	protected static final String sitRestrictionsCommandsBlockAllPath = "all"; // Old
+	protected static final String sitRestrictionsCommandsModePath = "mode";
+	protected static final String sitRestrictionsCommandsListPath = "list";
 
 	protected static final String msgSectionPath = "messages";
 	protected static final String msgEnabledPath = "enabled";
@@ -87,9 +88,8 @@ public class ChairsConfig {
 	public int effectsHealHealthPerInterval = 1;
 	public boolean effectsItemPickupEnabled = false;
 
-	public boolean restrictionsDisableAllCommands = false;
-	public final Set<String> restrictionsDisabledCommands = new HashSet<>();
-	public final Set<String> restrictionsAllowedCommands = new HashSet<>();
+	public ListMode restrictionsCommandsMode = ListMode.deny;
+	public final Set<String> restrictionsCommandsList = new HashSet<>();
 
 	public boolean msgEnabled = true;
 	public String msgSitEnter = "&7You are now sitting.";
@@ -157,11 +157,18 @@ public class ChairsConfig {
 			if (sitRestirctionsSection != null) {
 				ConfigurationSection sitRestrictionsCommandsSection = sitRestirctionsSection.getConfigurationSection(sitRestricitonsCommandsSectionPath);
 				if (sitRestrictionsCommandsSection != null) {
-					restrictionsDisableAllCommands = sitRestrictionsCommandsSection.getBoolean(sitRestrictionsCommandsBlockAllPath, restrictionsDisableAllCommands);
-					restrictionsDisabledCommands.clear();
-					restrictionsDisabledCommands.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsBlockListPath));
-					restrictionsAllowedCommands.clear();
-					restrictionsAllowedCommands.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsAllowListPath));
+					Bukkit.broadcastMessage("8 " + restrictionsCommandsMode.name());
+					restrictionsCommandsMode = ListMode.fromString(sitRestirctionsSection.getString(sitRestrictionsCommandsModePath, restrictionsCommandsMode.name()));
+					Bukkit.broadcastMessage("8 " + restrictionsCommandsMode.name());
+					restrictionsCommandsList.clear();
+					restrictionsCommandsList.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsListPath));
+					// Old config
+					if (sitRestrictionsCommandsSection.contains(sitRestrictionsCommandsBlockAllPath) && sitRestrictionsCommandsSection.getBoolean(sitRestrictionsCommandsBlockAllPath)) {
+						restrictionsCommandsList.clear();
+						Bukkit.broadcastMessage("- " + restrictionsCommandsMode.name());
+						restrictionsCommandsMode = ListMode.allow;
+						Bukkit.broadcastMessage("- " + restrictionsCommandsMode.name());
+					}
 				}
 			}
 
@@ -230,9 +237,10 @@ public class ChairsConfig {
 			{
 				ConfigurationSection sitRestrictionsCommandsSection = sitRestirctionsSection.createSection(sitRestricitonsCommandsSectionPath);
 				{
-					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockAllPath, restrictionsDisableAllCommands);
-					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockListPath, new ArrayList<>(restrictionsDisabledCommands));
-					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsAllowListPath, new ArrayList<>(restrictionsAllowedCommands));
+					Bukkit.broadcastMessage("9 " + restrictionsCommandsMode.name());
+					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsModePath, restrictionsCommandsMode.name());
+					Bukkit.broadcastMessage("9 " + restrictionsCommandsMode.name());
+					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsListPath, new ArrayList<>(restrictionsCommandsList));
 				}
 			}
 
@@ -248,6 +256,7 @@ public class ChairsConfig {
 					msgSitSection.set(msgSitCommandRestrictedPath, msgSitCommandRestricted);
 				}
 			}
+			Bukkit.broadcastMessage("10 " + restrictionsCommandsMode.name());
 
 			try {config.save(file);} catch (IOException e) {}
 		}
@@ -261,6 +270,18 @@ public class ChairsConfig {
 				return ChairEntityType.valueOf(string);
 			} catch (IllegalArgumentException e) {
 				return ChairEntityType.ARMOR_STAND;
+			}
+		}
+	}
+
+	public static enum ListMode {
+		allow, deny;
+
+		public static ListMode fromString(String string) {
+			try {
+				return ListMode.valueOf(string);
+			} catch (IllegalArgumentException e) {
+				return ListMode.deny;
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import com.cnaude.chairs.core.Chairs;
 import com.cnaude.chairs.core.ChairsConfig;
+import com.cnaude.chairs.core.ChairsConfig.ListMode;
 import com.cnaude.chairs.core.PlayerSitData;
 
 public class CommandRestrict implements Listener {
@@ -28,30 +29,11 @@ public class CommandRestrict implements Listener {
 		Player player = event.getPlayer();
 		String playercommand = event.getMessage().toLowerCase();
 		if (plugin.getPlayerSitData().isSitting(player)) {
-			Boolean cancel = false;
-			if (config.restrictionsDisableAllCommands) {
-				cancel = true;
-			}
-			else for (String disabledCommand : config.restrictionsDisabledCommands) {
-				if (playercommand.startsWith(disabledCommand)) {
-					String therest = playercommand.replace(disabledCommand, "");
-					if (therest.isEmpty() || therest.startsWith(" ")) {
-						cancel = true;
-					}
+			for (String command : config.restrictionsCommandsList) {
+				if (playercommand.startsWith(command) != config.restrictionsCommandsMode.equals(ListMode.allow)) {
+					event.setCancelled(true);
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.msgSitCommandRestricted));
 				}
-			}
-			for (String allowedCommand : config.restrictionsAllowedCommands) {
-				if (playercommand.startsWith(allowedCommand)) {
-					String therest = playercommand.replace(allowedCommand, "");
-					if (therest.isEmpty() || therest.startsWith(" ")) {
-						cancel = false;
-					}
-				}
-			}
-			if (cancel) {
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.msgSitCommandRestricted));
-				return;
 			}
 		}
 	}
