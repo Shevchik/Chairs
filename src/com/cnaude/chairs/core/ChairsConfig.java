@@ -157,17 +157,13 @@ public class ChairsConfig {
 			if (sitRestirctionsSection != null) {
 				ConfigurationSection sitRestrictionsCommandsSection = sitRestirctionsSection.getConfigurationSection(sitRestricitonsCommandsSectionPath);
 				if (sitRestrictionsCommandsSection != null) {
-					Bukkit.broadcastMessage("8 " + restrictionsCommandsMode.name());
 					restrictionsCommandsMode = ListMode.fromString(sitRestirctionsSection.getString(sitRestrictionsCommandsModePath, restrictionsCommandsMode.name()));
-					Bukkit.broadcastMessage("8 " + restrictionsCommandsMode.name());
 					restrictionsCommandsList.clear();
 					restrictionsCommandsList.addAll(sitRestrictionsCommandsSection.getStringList(sitRestrictionsCommandsListPath));
 					// Old config
 					if (sitRestrictionsCommandsSection.contains(sitRestrictionsCommandsBlockAllPath) && sitRestrictionsCommandsSection.getBoolean(sitRestrictionsCommandsBlockAllPath)) {
 						restrictionsCommandsList.clear();
-						Bukkit.broadcastMessage("- " + restrictionsCommandsMode.name());
 						restrictionsCommandsMode = ListMode.allow;
-						Bukkit.broadcastMessage("- " + restrictionsCommandsMode.name());
 					}
 				}
 			}
@@ -237,9 +233,7 @@ public class ChairsConfig {
 			{
 				ConfigurationSection sitRestrictionsCommandsSection = sitRestirctionsSection.createSection(sitRestricitonsCommandsSectionPath);
 				{
-					Bukkit.broadcastMessage("9 " + restrictionsCommandsMode.name());
 					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsModePath, restrictionsCommandsMode.name());
-					Bukkit.broadcastMessage("9 " + restrictionsCommandsMode.name());
 					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsListPath, new ArrayList<>(restrictionsCommandsList));
 				}
 			}
@@ -256,7 +250,6 @@ public class ChairsConfig {
 					msgSitSection.set(msgSitCommandRestrictedPath, msgSitCommandRestricted);
 				}
 			}
-			Bukkit.broadcastMessage("10 " + restrictionsCommandsMode.name());
 
 			try {config.save(file);} catch (IOException e) {}
 		}
