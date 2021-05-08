@@ -68,9 +68,10 @@ public class PlayerSitData {
 		SitData sitdata = null;
 		switch (plugin.getChairsConfig().sitChairEntityType) {
 			case ARROW: {
-				sitdata = new SitData(
+        int arrowresitinterval = plugin.getChairsConfig().sitArrowResitInterval;
+        sitdata = new SitData(
 					chairentity, player.getLocation(), blocktooccupy,
-					Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), 1000, 1000)
+					Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> resitPlayer(player), arrowresitinterval, arrowresitinterval)
 				);
 				break;
 			}
