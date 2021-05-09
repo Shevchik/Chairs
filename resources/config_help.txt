@@ -6,6 +6,7 @@
 #   max-distance: The maximum distance between the chair (the center of the block) and the player to be able to sit down (to prevent glitching through walls, etc.)
 #   require-empty-hand: Set this true to disable sitting if player is holding an item in hand.
 #   chair-entity-type: Entity type used as chair, allowed values are ARROW, ARMOR_STAND
+#   arrow-resit-interval: How often plugin will resit player in ticks, not allowed more than 1000 due to clientside prediction arrow removal delay
 #   stairs:
 #     enabled: enables all stairs as sit on blocks with special handling
 #     rotate: set to true to auto rotate player to face the descending side of the stairs
@@ -13,6 +14,7 @@
 #     special-end: set any sub options to true to require special block (one of them) at the end of the stairs line (only works if max-width is enabled)
 #       sign: require sign
 #       corner-stairs: require corner stairs
+#     height: Set sitting height on stairs
 #   additional-blocks: Set additional blocks you want to be able to sit down on and sitting height.
 #     COBBLESTONE_SLAB: 0.7
 # sit-effects:
