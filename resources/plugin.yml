@@ -1,21 +1,16 @@
 name: Chairs
 main: com.cnaude.chairs.core.Chairs
 api-version: 1.14
-version: 7.0
-description: Let players sit on blocks.
-website: http://dev.bukkit.org/bukkit-plugins/chairsreloaded/
-authors: 
- - spoothie
- - cnaude
- - _Shevchik_
- - Pugabyte
+version: ${version}
+
 commands:
-    chairs:
-        description: Various commands for Chairs.
-        usage: |
-          /<command> reload - reloads the configuration
-          /<command> off  - disable chairs for self
-          /<command> on - enable chairs for self
+  chairs:
+    description: Various commands for Chairs.
+    usage: |
+      /<command> reload - reloads the configuration
+      /<command> off  - disable chairs for self
+      /<command> on - enable chairs for self
+
 permissions:
   chairs.*:
     description: Gives access to all Chairs commands
@@ -32,3 +27,11 @@ permissions:
   chairs.sit.health:
     description: Allows regenerating health while sitting (if enabled)
     default: true
+
+description: Let players sit on blocks
+website: http://dev.bukkit.org/bukkit-plugins/chairsreloaded/
+authors: 
+ - spoothie
+ - cnaude
+ - _Shevchik_
+ - Pugabyte

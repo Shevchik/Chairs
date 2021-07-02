@@ -1,6 +1,7 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '5.0.0'
 	id 'java'
+	id 'com.github.johnrengelman.shadow' version '7.0.0'
+	id 'maven-publish'
 }
 
 
@@ -34,7 +35,6 @@ sourceSets {
 
 repositories {
 	mavenCentral()
-	jcenter()
 	maven {
 		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
@@ -46,8 +46,18 @@ repositories {
 	}
 }
 
+configurations {
+	runtimeDependencies
+	compileOnly {
+		extendsFrom runtimeDependencies
+	}
+	testImplementation {
+	    extendsFrom runtimeDependencies
+	}
+}
+
 dependencies {
-	compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.14-R0.1-SNAPSHOT'
+	runtimeDependencies group: 'org.spigotmc', name: 'spigot-api', version: '1.14-R0.1-SNAPSHOT'
 }
 
 compileJava {
@@ -56,22 +66,33 @@ compileJava {
 }
 
 
+processResources {
+	filesMatching('plugin.yml') {
+		expand 'version': project.version
+	}
+}
+
 shadowJar {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+	archiveClassifier = ''
+
 	from sourceSets.main.java.srcDirs
 	from 'LICENSE'
 
-	archiveName = jar.archiveName
+	exclude 'META-INF/**'
+	exclude 'module-info.class'
 
 	minimize()
 }
 
 
 task copyFinalJarToTarget(type: DefaultTask) {doLast{
-	Path targetJarDirectory = projectDirectoryPath.resolve("target")
+	Path targetJarDirectory = projectDirectoryPath.resolve('target')
 	Files.createDirectories(targetJarDirectory)
 	Files.copy(
-		shadowJar.archivePath.toPath().toAbsolutePath(),
-		targetJarDirectory.resolve(shadowJar.baseName + '.jar'),
+		shadowJar.archiveFile.get().getAsFile().toPath().toAbsolutePath(),
+		targetJarDirectory.resolve(shadowJar.archiveBaseName.get() + '.jar'),
 		java.nio.file.StandardCopyOption.REPLACE_EXISTING
 	)
 }}
@@ -81,3 +102,18 @@ compileJava.dependsOn(clean)
 jar.enabled = false
 jar.finalizedBy(shadowJar)
 shadowJar.finalizedBy(copyFinalJarToTarget)
+
+
+tasks.withType(GenerateModuleMetadata) {
+	enabled = false
+}
+
+publishing {
+	publications {
+		release(MavenPublication) {
+			from components.java
+
+			artifacts = [shadowJar]
+		}
+	}
+}
