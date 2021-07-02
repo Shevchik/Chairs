@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
@@ -65,7 +66,11 @@ public class SitUtils {
 			return false;
 		}
 
-		if (config.sitDisabledWorlds.contains(player.getWorld().getName())) {
+		World world = player.getWorld();
+		if (config.sitDisabledWorlds.contains(world.getName())) {
+			return false;
+		}
+		if (!world.equals(block.getWorld())) {
 			return false;
 		}
 		if ((config.sitMaxDistance > 0) && (player.getLocation().distance(block.getLocation().add(0.5, 0, 0.5)) > config.sitMaxDistance)) {
